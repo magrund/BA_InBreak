@@ -5,7 +5,6 @@ from utils.create_dataset import create_dataset_with_split
 from utils.check_if_data_complete import validate_data_pairs
 from utils.rename_and_restructure_npz_files import rename_and_copy_npz_files
 from utils.test_dataset_labels import process_images
-from utils.test_dataset_labels_copy import process_image
 
 
 videos_info_csv = 'dataset/base/videos_info.csv'
