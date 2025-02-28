@@ -3,5 +3,4 @@ brace/dataset/manual_keypoints/
 brace/utils/__pycache__/
 brace/dataset/.DS_Store
 brace/.DS_Store
-brace/dataset/base/manual_keypoints/
-brace/dataset/restructured_keypoints/
+brace/dataset/
