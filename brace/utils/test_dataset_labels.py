@@ -1,12 +1,12 @@
-import cv2
-import numpy as np
 import os
+import cv2
+import random
 
 keypoint_labels = [
-    "Nase", "Linkes Auge", "Rechtes Auge", "Linkes Ohr", "Rechtes Ohr",
-    "Linke Schulter", "Rechte Schulter", "Linker Ellbogen", "Rechter Ellbogen",
-    "Linkes Handgelenk", "Rechtes Handgelenk", "Linke Hüfte", "Rechte Hüfte",
-    "Linkes Knie", "Rechtes Knie", "Linker Knöchel", "Rechter Knöchel"
+    "Nose", "Left eye", "Right eye", "Left ear", "Right ear",
+    "Left shoulder", "Right shoulder", "Left elbow", "Right elbow",
+    "Left wrist", "Right wrist", "Left hip", "Right hip",
+    "Left knee", "Right knee", "Left ankle", "Right ankle"
 ]
 
 def draw_label_on_image(image_path, label_path, output_path):
@@ -33,7 +33,7 @@ def draw_label_on_image(image_path, label_path, output_path):
     x_max = int(x_center + width / 2)
     y_max = int(y_center + height / 2)
     
-    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 255), 2)
     
     for idx, (x, y, v) in enumerate(keypoints):
         x = int(x * image_width)
@@ -44,7 +44,7 @@ def draw_label_on_image(image_path, label_path, output_path):
     
     left_space = x_min
     right_space = image_width - x_max
-    legend_x = x_max + 10 if right_space > left_space else x_min - 150
+    legend_x = x_max + 10 if right_space > left_space else x_min - 200
     
     for idx, label in enumerate(keypoint_labels):
         cv2.putText(image, f"{idx + 1}: {label}", (legend_x, y_min + 20 + idx * 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
@@ -56,6 +56,7 @@ def process_images(dataset_folder, output_folder, num_images):
     label_folder = os.path.join(dataset_folder, 'train/labels')
 
     image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
+    random.shuffle(image_files)
     image_files = image_files[:num_images]
     
     for image_file in image_files:
