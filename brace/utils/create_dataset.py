@@ -6,30 +6,37 @@ from PIL import Image
 import re
 
 def create_relative_bounding_box(keypoints, image_width, image_height, buffer):
-    buffer_x = image_width * buffer
-    buffer_y = image_height * buffer
-    
-    x_min = max(0, np.min(keypoints[:, 0]) - buffer_x)
-    y_min = max(0, np.min(keypoints[:, 1]) - buffer_y)
-    x_max = min(image_width, np.max(keypoints[:, 0]) + buffer_x)
-    y_max = min(image_height, np.max(keypoints[:, 1]) + buffer_y)
-    
+    x_min = np.min(keypoints[:, 0])
+    y_min = np.min(keypoints[:, 1])
+    x_max = np.max(keypoints[:, 0])
+    y_max = np.max(keypoints[:, 1])
+
+    width = x_max - x_min
+    height = y_max - y_min
+    buffer_x = width * buffer
+    buffer_y = height * buffer
+
+    x_min = max(0, x_min - buffer_x)
+    y_min = max(0, y_min - buffer_y)
+    x_max = min(image_width, x_max + buffer_x)
+    y_max = min(image_height, y_max + buffer_y)
+
     x_center = (x_min + x_max) / 2
     y_center = (y_min + y_max) / 2
     bbox_width = x_max - x_min
     bbox_height = y_max - y_min
-    
+
     x_center_rel = x_center / image_width
     y_center_rel = y_center / image_height
     width_rel = bbox_width / image_width
     height_rel = bbox_height / image_height
-    
+
     return x_center_rel, y_center_rel, width_rel, height_rel
 
 def get_annotation_content(npz_file_path, image_width, image_height):
     keypoints = np.load(npz_file_path)['coco_joints2d'][:, :2]
     
-    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.03)
+    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.3)
     
     content = f"0 {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}"
     
