@@ -4,3 +4,5 @@ brace/utils/__pycache__/
 brace/dataset/.DS_Store
 brace/.DS_Store
 brace/dataset/
+inBreak/utils/__pycache__/
+inBreak/utils/mediapipe_annotation/__pycache__/
