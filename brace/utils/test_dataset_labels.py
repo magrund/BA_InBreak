@@ -56,6 +56,7 @@ def process_images(dataset_folder, output_folder, num_images):
     label_folder = os.path.join(dataset_folder, 'train/labels')
 
     image_files = [f for f in os.listdir(image_folder) if f.endswith('.jpg')]
+    random.seed(42)
     random.shuffle(image_files)
     image_files = image_files[:num_images]
     

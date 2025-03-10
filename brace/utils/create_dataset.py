@@ -36,7 +36,7 @@ def create_relative_bounding_box(keypoints, image_width, image_height, buffer):
 def get_annotation_content(npz_file_path, image_width, image_height):
     keypoints = np.load(npz_file_path)['coco_joints2d'][:, :2]
     
-    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.3)
+    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.8)
     
     content = f"0 {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}"
     
@@ -61,6 +61,7 @@ def split_data(destination_folder, split_ratio):
     image_files = [f for f in os.listdir(train_image_dir) if f.endswith('.jpg') or f.endswith('.png')]
     
     val_size = int(len(image_files) * split_ratio)
+    random.seed(42)
     val_files = random.sample(image_files, val_size)
     
     for image_file in val_files:
