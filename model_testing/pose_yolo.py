@@ -1,8 +1,11 @@
 import cv2
 from ultralytics import YOLO
 import numpy as np
+from keypoints_and_pairs import COCO_KEYPOINT_PAIRS
 
 model = YOLO("models/yolo11m-pose.pt")
+color = (255, 0, 0)
+confidence_threshold = 0.5
 
 def yolo_pose_detection(input_video, output_video):
     print("YOLO: Start processing video")
@@ -25,11 +28,19 @@ def yolo_pose_detection(input_video, output_video):
 
         results = model(frame)
         for result in results:
-            kpts = result.keypoints.data
-            for kpt in kpts[0]:
-                x, y, conf = kpt.tolist()
-                if conf > 0.5:
-                    cv2.circle(frame, (int(x), int(y)), 5, (0, 255, 0), -1)
+            kpts = result.keypoints.data[0].cpu().numpy()
+
+            for kpt in kpts:
+                x, y, conf = kpt
+                if conf > confidence_threshold:
+                    cv2.circle(frame, (int(x), int(y)), 5, color, -1)
+
+            for pair in COCO_KEYPOINT_PAIRS:
+                if pair[0] < len(kpts) and pair[1] < len(kpts):
+                    x1, y1, conf1 = kpts[pair[0]]
+                    x2, y2, conf2 = kpts[pair[1]]
+                    if conf1 > confidence_threshold and conf2 > confidence_threshold:
+                        cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
 
         out.write(frame)
 
