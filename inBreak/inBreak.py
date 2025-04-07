@@ -6,6 +6,8 @@ from utils.download_videos_from_youtube import download_video_segments
 from utils.export_frames_from_video import export_frames_from_segments
 from utils.check_if_all_frames_exported import check_if_all_frames_exist_from_csv
 from utils.mediapipe_annotation.annotate_videos_with_mediapipe import annotate_segments_in_folder
+from utils.split_dataset_and_create_bounding_boxes import split_data_and_add_bounding_box
+from utils.test_dataset_labels import process_images
 
 urls_path = 'dataset/urls.csv'
 segments_info_path = 'dataset/segments_info.csv'
@@ -16,6 +18,9 @@ statistics_path = 'dataset/statistics.txt'
 video_segments_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/segments'
 frames_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/frames'
 annotations_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/annotations'
+
+dataset_folder = '/Users/mgrund/Desktop/inBreak_V1'
+test_labels_folder = '/Users/mgrund/Desktop/inBreak_V1/test/'
 
 
 def add_data():
@@ -37,20 +42,28 @@ def create_data_info():
 def create_statistics():
     save_statistics_to_file(video_segments_path, statistics_path)
 
-def createData():
+def create_data():
     download_video_segments(video_info_path, segments_info_path, video_segments_folder)
     export_frames_from_segments(video_segments_path, video_segments_folder, frames_folder)
     check_if_all_frames_exist_from_csv(video_segments_path, frames_folder)
 
-def createAutomatedAnnotation():
+def create_automated_annotation():
     annotate_segments_in_folder(frames_folder, annotations_folder)
 
+def split_dataset():
+    split_data_and_add_bounding_box(dataset_folder, 0.2, 0.2)
+    process_images(dataset_folder, test_labels_folder, 50)
+
+
 if __name__ == '__main__':
-    mode = "createData"
+    mode = "splitData"
+
     if mode == "addData":
         add_data()
     elif mode == "createData":
         create_data_info()
         create_statistics()
-        createData()
-        createAutomatedAnnotation()
+        create_data()
+        create_automated_annotation()
+    elif mode == "splitData":
+        split_dataset()
