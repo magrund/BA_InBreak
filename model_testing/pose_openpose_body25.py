@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-from keypoints_and_pairs import BODY_25_KEYPOINTS, BODY_25_KEYPOINTS_PAIRS
+from keypoints_and_pairs import BODY_25_KEYPOINTS, OPENPOSE_BODY_25_KEYPOINTS_PAIRS
+from colors import openpose_body25_color
 
 proto_file = "models/body25/pose_deploy.prototxt"
 weights_file = "models/body25/pose_iter_584000.caffemodel"
@@ -9,7 +10,6 @@ n_points = len(BODY_25_KEYPOINTS)
 
 net = cv2.dnn.readNetFromCaffe(proto_file, weights_file)
 
-color = (0, 255, 255)
 confidence_threshold = 0.1
 
 def openpose_body25_pose_detection(input_video, output_video):
@@ -26,6 +26,8 @@ def openpose_body25_pose_detection(input_video, output_video):
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     out = cv2.VideoWriter(output_video + "_openpose_body25.mp4", fourcc, fps, (frame_width, frame_height))
 
+    keypoints_list = []
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -38,20 +40,27 @@ def openpose_body25_pose_detection(input_video, output_video):
 
         points = {}
 
+        frame_keypoints = []
+
         for idx, keypoint in enumerate(BODY_25_KEYPOINTS):
             heatmap = output[0, keypoint, :, :]
-            _, conf, _, point = cv2.minMaxLoc(heatmap)
+            _, confidence, _, point = cv2.minMaxLoc(heatmap)
 
             x = int(frame_width * point[0] / output.shape[3])
             y = int(frame_height * point[1] / output.shape[2])
 
-            if conf > confidence_threshold:
-                points[keypoint] = (x, y)
-                cv2.circle(frame, (x, y), 5, color, thickness=-1, lineType=cv2.FILLED)
+            frame_keypoints.append({"x": int(x), "y": int(y), "confidence": confidence, "idx": str(idx)})
+            print(idx)
 
-        for part_a, part_b in BODY_25_KEYPOINTS_PAIRS:
+            if confidence > confidence_threshold:
+                points[keypoint] = (x, y)
+                cv2.circle(frame, (x, y), 5, openpose_body25_color, thickness=-1, lineType=cv2.FILLED)
+
+        keypoints_list.append(frame_keypoints)
+
+        for part_a, part_b in OPENPOSE_BODY_25_KEYPOINTS_PAIRS:
             if part_a in points and part_b in points:
-                cv2.line(frame, points[part_a], points[part_b], color, 2, lineType=cv2.LINE_AA)
+                cv2.line(frame, points[part_a], points[part_b], openpose_body25_color, 2, lineType=cv2.LINE_AA)
 
         out.write(frame)
 
@@ -60,3 +69,5 @@ def openpose_body25_pose_detection(input_video, output_video):
     cv2.destroyAllWindows()
 
     print("OpenPose BODY25: Video done:", output_video)
+
+    return keypoints_list

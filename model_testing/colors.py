@@ -1,0 +1,6 @@
+movenet_color = (0, 255, 0)
+yolo_color = (255, 0, 0)
+mediapipe_with_tracking_color = (0, 0, 255)
+mediapipe_no_tracking_color = (255, 0, 255)
+openpose_coco_color = (0, 255, 255)
+openpose_body25_color = (255, 255, 0)

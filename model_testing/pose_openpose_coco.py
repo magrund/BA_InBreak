@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from keypoints_and_pairs import OPENPOSE_COCO_KEYPOINTS, OPENPOSE_COCO_KEYPOINTS_PAIRS
+from colors import openpose_coco_color
 
 proto_file = "models/coco/pose_deploy_linevec.prototxt"
 weights_file = "models/coco/pose_iter_440000.caffemodel"
@@ -26,6 +27,8 @@ def openpose_coco_pose_detection(input_video, output_video):
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     out = cv2.VideoWriter(output_video + "_openpose_coco.mp4", fourcc, fps, (frame_width, frame_height))
 
+    keypoints_list = []
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -38,20 +41,26 @@ def openpose_coco_pose_detection(input_video, output_video):
 
         points = {}
 
+        frame_keypoints = []
+
         for idx, keypoint in enumerate(OPENPOSE_COCO_KEYPOINTS):
             heatmap = output[0, keypoint, :, :]
-            _, conf, _, point = cv2.minMaxLoc(heatmap)
+            _, confidence, _, point = cv2.minMaxLoc(heatmap)
 
             x = int(frame_width * point[0] / output.shape[3])
             y = int(frame_height * point[1] / output.shape[2])
 
-            if conf > confidence_threshold:
+            frame_keypoints.append({"x": int(x), "y": int(y), "confidence": confidence})
+
+            if confidence > confidence_threshold:
                 points[keypoint] = (x, y)
-                cv2.circle(frame, (x, y), 5, color, thickness=-1, lineType=cv2.FILLED)
+                cv2.circle(frame, (x, y), 5, openpose_coco_color, thickness=-1, lineType=cv2.FILLED)
+
+        keypoints_list.append(frame_keypoints)
 
         for part_a, part_b in OPENPOSE_COCO_KEYPOINTS_PAIRS:
             if part_a in points and part_b in points:
-                cv2.line(frame, points[part_a], points[part_b], color, 2, lineType=cv2.LINE_AA)
+                cv2.line(frame, points[part_a], points[part_b], openpose_coco_color, 2, lineType=cv2.LINE_AA)
 
         out.write(frame)
 
@@ -60,3 +69,5 @@ def openpose_coco_pose_detection(input_video, output_video):
     cv2.destroyAllWindows()
 
     print("OpenPose COCO: Video done:", output_video)
+
+    return keypoints_list

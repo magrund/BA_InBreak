@@ -31,7 +31,7 @@ OPENPOSE_COCO_KEYPOINTS_PAIRS = [
 
 BODY_25_KEYPOINTS = [0, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 
-BODY_25_KEYPOINTS_PAIRS = [
+OPENPOSE_BODY_25_KEYPOINTS_PAIRS = [
     (0, 15), (0, 16), (15, 17), (16, 18),
     (2, 3), (3, 4),
     (5, 6), (6, 7),
