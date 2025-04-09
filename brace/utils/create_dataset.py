@@ -3,7 +3,6 @@ import numpy as np
 import shutil
 import random
 from PIL import Image
-import re
 
 def create_relative_bounding_box(keypoints, image_width, image_height, buffer):
     x_min = np.min(keypoints[:, 0])
@@ -36,7 +35,7 @@ def create_relative_bounding_box(keypoints, image_width, image_height, buffer):
 def get_annotation_content(npz_file_path, image_width, image_height):
     keypoints = np.load(npz_file_path)['coco_joints2d'][:, :2]
     
-    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.8)
+    bbox = create_relative_bounding_box(keypoints, image_width, image_height, buffer=0.2)
     
     content = f"0 {bbox[0]} {bbox[1]} {bbox[2]} {bbox[3]}"
     
