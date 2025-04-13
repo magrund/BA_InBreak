@@ -89,8 +89,6 @@ def create_relative_bounding_box_and_update_label(label_file, image_width, image
 
         updated_line += "\n"
         updated_lines.append(updated_line)
-    else:
-        updated_lines.append(line)
 
     with open(label_file, 'w') as file:
         file.writelines(updated_lines)
