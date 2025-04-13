@@ -12,6 +12,10 @@ model_testing/*.mp4
 model_testing/*.MOV
 model_testing/__pycache__/
 model_testing/models/
+model_testing/
+yolo_model_testing/evaluation_dataset/
+yolo_model_testing/output/
+yolo_model_testing/models/
 model_evaluation/evaluation_dataset/
 model_evaluation/models/
 model_evaluation/output/
