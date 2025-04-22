@@ -1,0 +1,77 @@
+Total Frames: 1005
+
+Total Sequences: 39
+
+Total Dancers: 35
+
+Frames per Type:
+Freeze: 639
+Powermove: 213
+Transition: 153
+
+Frames per Dancer:
+Flo: 31
+Light: 56
+NordDiamond: 31
+Sanam: 25
+Elina: 25
+Paul: 31
+GSpace: 31
+Tiger: 31
+Fly: 16
+Conejo: 31
+Salo: 31
+Punisher: 16
+Bobby: 31
+Wenxian: 19
+Gekkon: 16
+Vic: 31
+Sona: 31
+Nik?: 31
+Mike: 31
+Pauline: 22
+Syssy: 25
+LaVix: 16
+Mace: 31
+Quake: 19
+Nanaka: 47
+HD: 22
+VaVi: 19
+SanAndrea: 13
+Jilou: 47
+Luisa: 16
+Steelish: 65
+Meow: 16
+Melina: 46
+Lou: 25
+MakuGold: 31
+
+Frames per Gender:
+male: 536
+female: 469
+
+Frames per Channel:
+UCJtya3DH0XQUk0NcNWw8u8Q: 1005
+
+Frames per Video ID:
+yqsptjJV-6M: 31
+4uy-uthcNQE: 137
+-hDdf20406s: 140
+RyfLe7H455k: 113
+NQjcQj_6_gY: 62
+Vk-nde0LrNU: 62
+hOU4gkVCUo8: 22
+QaA6NecgK6A: 41
+keSXyvqrlp8: 50
+EcWTAAhJJfE: 47
+ZPPPgEEMXNA: 22
+uJfYa88YUe4: 19
+QrXkwk1Mkyw: 13
+voYEIwoUcGY: 22
+YHU7uWFo8L0: 16
+kVzvf6YZwtM: 19
+3OnIkDWB5KI: 16
+oiU9EazZ-gc: 46
+t2uvsdV86x4: 50
+_j56O3AEsq0: 46
+kLHb01dBVpk: 31
