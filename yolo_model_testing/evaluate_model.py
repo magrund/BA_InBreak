@@ -3,6 +3,8 @@ import os
 import math
 from collections import defaultdict
 from ultralytics import YOLO
+import csv
+import re
 
 COCO_KEYPOINT_PAIRS = [
     (0, 1), (0, 2), (1, 3), (2, 4),
@@ -47,8 +49,11 @@ def get_yolo_keypoints(image, model):
     results = model(image)
     for result in results:
         kpts = result.keypoints.data[0].cpu().numpy()
-        return [(x, y, conf) for x, y, conf in kpts]
-    return []
+        speed = result.speed  # dict: {'preprocess': x, 'inference': y, 'postprocess': z}
+        total_time = speed.get('preprocess', 0.0) + speed.get('inference', 0.0) + speed.get('postprocess', 0.0)
+        return [(x, y, conf) for x, y, conf in kpts], total_time
+    return [], 0.0
+
 
 def draw_keypoints(image, keypoints, color, is_yolo=False):
     if not is_yolo:
@@ -93,6 +98,7 @@ class KeypointEvaluator:
         self.stats_by_bodypart_raw = defaultdict(list)
         self.stats_per_image = {}
         self.recognized_images = 0  
+        self.total_times = []
         self.face_indices = set(range(5))
         self.face_weight = 0.5
         self.error_clip = 50.0
@@ -112,7 +118,8 @@ class KeypointEvaluator:
 
         h, w = image.shape[:2]
         label_keypoints = get_label_keypoints(label_path, w, h)
-        yolo_keypoints = get_yolo_keypoints(image, self.model)
+        yolo_keypoints, total_time = get_yolo_keypoints(image, self.model)
+        self.total_times.append(total_time)
 
         image_vis = image.copy()
         image_vis = draw_keypoints(image_vis, label_keypoints, LABEL_COLOR, is_yolo=False)
@@ -192,7 +199,12 @@ class KeypointEvaluator:
 
     def generate_statistics(self):
         stats_lines = []
+        avg_total_time = sum(self.total_times) / len(self.total_times) if self.total_times else 0
+        sum_total_time = sum(self.total_times)
+
         stats_lines.append(f"Detected images: {self.recognized_images} of {self.total_images}")
+        stats_lines.append(f"Average Total Inference Time:        {avg_total_time:.2f} ms")
+        stats_lines.append(f"Total Time for All Images:           {sum_total_time/1000:.2f} seconds")
         stats_lines.append("")
 
         overall_avg_error = sum(self.overall_errors) / len(self.overall_errors) if self.overall_errors else 0
@@ -253,18 +265,135 @@ class KeypointEvaluator:
             f.write(stats_text)
         print(f"Statistic saved in '{output_path}'.")
 
+def extract_value(value_str):
+    """Extrahiert den numerischen Wert aus der Klammer und entfernt 'px'."""
+    match = re.search(r"\((\d+(\.\d+)?)\s*px\)", value_str)
+    if match:
+        return float(match.group(1))
+    return None
+
+def remove_px_and_parentheses(value_str):
+    """Entfernt die 'px'-Einheit und die Klammer aus dem Wert."""
+    value_without_px = re.sub(r" px", "", value_str)
+    value_without_parentheses = re.sub(r"\(.*\)", "", value_without_px)
+    return value_without_parentheses.strip()
+
+def generate_model_summary_table(output_base, output_csv="model_summary.csv"):
+    all_rows = []
+    headers = [
+        "Model", "Detected", "Overall Deviation", "Raw Overall Deviation", "Mean Confidence", 
+        "Freeze", "Powermove", "Transition", "Bboy", "Bgirl", 
+        "Raw Freeze", "Raw Powermove", "Raw Transition", "Raw Bboy", "Raw Bgirl",
+        "Average Inference Time (ms)", "Total Time (s)"
+    ]
+
+    movement_keys = ["Freeze", "Powermove", "Transition"]
+    gender_keys = ["Bboy", "Bgirl"]
+
+    movement_aliases = {
+        "freeze": "Freeze",
+        "power": "Powermove",
+        "powermove": "Powermove",
+        "transition": "Transition"
+    }
+
+    gender_aliases = {
+        "bboy": "Bboy",
+        "bgirl": "Bgirl"
+    }
+
+    for folder_name in os.listdir(output_base):
+        folder_path = os.path.join(output_base, folder_name)
+        stats_file = os.path.join(folder_path, "statistics.txt")
+
+        if not os.path.isfile(stats_file):
+            continue
+
+        with open(stats_file, 'r') as f:
+            lines = f.readlines()
+
+        model_name = folder_name.replace('_yolo-pose', '')
+        row = {key: "" for key in headers}
+        row["Model"] = model_name
+
+        for i, line in enumerate(lines):
+            line_clean = line.strip()
+            lower_line = line_clean.lower()
+
+            if "detected images:" in lower_line:
+                parts = line_clean.split(":")[1].split("of")
+                row["Detected"] = parts[0].strip()
+
+            elif "average total inference time" in lower_line:
+                match = re.search(r"([\d.]+)\s*ms", line_clean)
+                if match:
+                    row["Average Inference Time (ms)"] = match.group(1)
+
+            elif "total time for all images" in lower_line:
+                match = re.search(r"([\d.]+)\s*seconds", line_clean)
+                if match:
+                    row["Total Time (s)"] = match.group(1)
+
+            elif "mean deviation:" in lower_line and "overall" in lines[i - 1].lower():
+                row["Overall Deviation"] = remove_px_and_parentheses(line_clean.split(":")[1].strip())
+                row["Raw Overall Deviation"] = extract_value(line_clean)
+
+            elif "mean confidence score:" in lower_line:
+                row["Mean Confidence"] = remove_px_and_parentheses(line_clean.split(":")[1].strip())
+
+            else:
+                for key, std_name in movement_aliases.items():
+                    if key in lower_line:
+                        parts = line_clean.split("Mean Deviation:")
+                        if len(parts) == 2:
+                            value = parts[1].strip()
+                            row[std_name] = remove_px_and_parentheses(value)
+                            row[f"Raw {std_name}"] = extract_value(value)
+                for key, std_name in gender_aliases.items():
+                    if key in lower_line:
+                        parts = line_clean.split("Mean Deviation:")
+                        if len(parts) == 2:
+                            value = parts[1].strip()
+                            row[std_name] = remove_px_and_parentheses(value)
+                            row[f"Raw {std_name}"] = extract_value(value)
+
+        all_rows.append(row)
+
+    out_path = os.path.join(output_base, output_csv)
+    with open(out_path, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=headers)
+        writer.writeheader()
+        writer.writerows(all_rows)
+
+
 if __name__ == '__main__':
     image_folder = 'evaluation_dataset/images/'
     label_folder = 'evaluation_dataset/labels/'
+    model_dir = 'models/'
+    output_base = 'output/'
 
-    model_name = 'yolo11m-pose'
+    model_files = [f for f in os.listdir(model_dir) if f.endswith('.pt')]
 
-    model = YOLO('models/' + model_name + '.pt')
-    output_folder = 'output/yolo_pose_' + model_name
+    for model_file in model_files:
+        model_name = os.path.splitext(model_file)[0]
+        output_folder = os.path.join(output_base, model_name)
+        stats_file = os.path.join(output_folder, "statistics.txt")
 
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    
-    evaluator = KeypointEvaluator(image_folder, label_folder, output_folder, model)
-    evaluator.evaluate_dataset()
-    evaluator.write_statistics("statistics.txt")
+        if os.path.exists(stats_file):
+            print(f"Skipping {model_name}: Statistics already exist.")
+            continue
+
+        print(f"Evaluating: {model_name}")
+        model_path = os.path.join(model_dir, model_file)
+        model = YOLO(model_path)
+
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+
+        evaluator = KeypointEvaluator(image_folder, label_folder, output_folder, model)
+        evaluator.evaluate_dataset()
+        evaluator.write_statistics("statistics.txt")
+
+        print(f"Done: {model_name}")
+
+    generate_model_summary_table(output_base, "model_summary.csv")
