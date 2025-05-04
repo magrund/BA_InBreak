@@ -1,0 +1,7 @@
+train: BA_InBreak_0.3/train/images
+val: BA_InBreak_0.3/val/images
+
+
+nc: 1
+names: ['person']
+kpt_shape: [17, 3]
