@@ -1,3 +1,4 @@
+.gitignore
 brace/__pycache__/
 brace/dataset/manual_keypoints/
 brace/utils/__pycache__/
