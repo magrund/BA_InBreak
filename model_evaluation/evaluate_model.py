@@ -49,7 +49,7 @@ def get_yolo_keypoints(image, model):
     results = model(image)
     for result in results:
         kpts = result.keypoints.data[0].cpu().numpy()
-        speed = result.speed  # dict: {'preprocess': x, 'inference': y, 'postprocess': z}
+        speed = result.speed
         total_time = speed.get('preprocess', 0.0) + speed.get('inference', 0.0) + speed.get('postprocess', 0.0)
         return [(x, y, conf) for x, y, conf in kpts], total_time
     return [], 0.0
@@ -266,14 +266,12 @@ class KeypointEvaluator:
         print(f"Statistic saved in '{output_path}'.")
 
 def extract_value(value_str):
-    """Extrahiert den numerischen Wert aus der Klammer und entfernt 'px'."""
     match = re.search(r"\((\d+(\.\d+)?)\s*px\)", value_str)
     if match:
         return float(match.group(1))
     return None
 
 def remove_px_and_parentheses(value_str):
-    """Entfernt die 'px'-Einheit und die Klammer aus dem Wert."""
     value_without_px = re.sub(r" px", "", value_str)
     value_without_parentheses = re.sub(r"\(.*\)", "", value_without_px)
     return value_without_parentheses.strip()
@@ -367,10 +365,10 @@ def generate_model_summary_table(output_base, output_csv="model_summary.csv"):
 
 
 if __name__ == '__main__':
-    image_folder = 'evaluation_dataset/images/'
-    label_folder = 'evaluation_dataset/labels/'
-    model_dir = 'models/'
-    output_base = 'output/'
+    image_folder = 'DATASET_PATH/images/'
+    label_folder = 'DATASET_PATH/labels/'
+    model_dir = 'MODELS_PATH/'
+    output_base = 'OUTPUT_PATH/'
 
     model_files = [f for f in os.listdir(model_dir) if f.endswith('.pt')]
 

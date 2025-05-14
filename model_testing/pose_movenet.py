@@ -4,12 +4,12 @@ import numpy as np
 from keypoints_and_pairs import COCO_KEYPOINT_PAIRS
 from colors import movenet_color
 
-interpreter = tf.lite.Interpreter(model_path="models/movenet_thunder_singlepose.tflite")
+interpreter = tf.lite.Interpreter(model_path="MODEL_PATH")
 interpreter.allocate_tensors()
 
 INPUT_DETAILS = interpreter.get_input_details()
 OUTPUT_DETAILS = interpreter.get_output_details()
-model_size = 256
+model_size = "INT NUMBER"
 
 confidence_threshold = 0.5
 

@@ -3,8 +3,8 @@ import numpy as np
 from keypoints_and_pairs import BODY_25_KEYPOINTS, OPENPOSE_BODY_25_KEYPOINTS_PAIRS
 from colors import openpose_body25_color
 
-proto_file = "models/body25/pose_deploy.prototxt"
-weights_file = "models/body25/pose_iter_584000.caffemodel"
+proto_file = "PROTO_FILE_PATH"
+weights_file = "WEIGHTS_FILE_PATH"
 
 n_points = len(BODY_25_KEYPOINTS)
 

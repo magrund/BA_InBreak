@@ -15,12 +15,12 @@ video_info_path = 'dataset/video_info.csv'
 video_segments_path = 'dataset/video_segments.csv'
 statistics_path = 'dataset/statistics.txt'
 
-video_segments_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/segments'
-frames_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/frames'
-annotations_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/inBreak/annotations'
+video_segments_folder = 'VIDEO_SEGMENTS_FOLDER'
+frames_folder = 'FRAMES_FOLDER'
+annotations_folder = 'ANNOTATIONS_FOLDER'
 
-dataset_folder = '/Users/mgrund/Desktop/inBreak_V1'
-test_labels_folder = '/Users/mgrund/Desktop/inBreak_V1/test/'
+dataset_folder = 'DATASET_FOLDER'
+test_labels_folder = 'TEST_LABELS_FOLDER'
 
 
 def add_data():
@@ -56,7 +56,7 @@ def split_dataset():
 
 
 if __name__ == '__main__':
-    mode = "splitData"
+    mode = "mode" # addData, createData, splitData
 
     if mode == "addData":
         add_data()

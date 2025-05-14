@@ -4,7 +4,7 @@ import numpy as np
 from keypoints_and_pairs import COCO_KEYPOINT_PAIRS
 from colors import yolo_color
 
-model = YOLO("models/best.pt")
+model = YOLO("MODEL_PATH")
 
 confidence_threshold = 0.1
 

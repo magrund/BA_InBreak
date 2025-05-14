@@ -3,8 +3,8 @@ import numpy as np
 from keypoints_and_pairs import OPENPOSE_COCO_KEYPOINTS, OPENPOSE_COCO_KEYPOINTS_PAIRS
 from colors import openpose_coco_color
 
-proto_file = "models/coco/pose_deploy_linevec.prototxt"
-weights_file = "models/coco/pose_iter_440000.caffemodel"
+proto_file = "PROTO_FILE_PATH"
+weights_file = "WEIGHTS_FILE_PATH"
 
 n_points = len(OPENPOSE_COCO_KEYPOINTS)
 

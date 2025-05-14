@@ -18,14 +18,12 @@ annotated_footwork_segments_csv = 'dataset/annotated_footwork_segments.csv'
 manual_keypoints_folder = 'dataset/base/manual_keypoints'
 restructured_keypoints_folder = 'dataset/restructured_keypoints'
 brace_folder = 'dataset'
-dataset_destinaton_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/dataset'
-videos_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/videos'
-frames_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/frames'
+dataset_destinaton_folder = 'DESTINATION_FOLDER'
+videos_folder = 'VIDEOS_FOLDER'
+frames_folder = 'FRAMES_FOLDER'
 
-dataset_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/dataset'
-test_dataset_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/dataset/test'
-dataset_old_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/yolo_powermove_data'
-dataset_old_images_folder = '/Volumes/4TB_Podonne/BA_Marcel_Grund/brace/yolo_powermove_data/test'
+dataset_folder = 'DATASET_FOLDER'
+test_dataset_folder = 'TEST_DATASET_FOLDER'
 
 def prepare_data():
     create_dance_type_csvs(segments_csv, brace_folder)
